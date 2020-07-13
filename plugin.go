@@ -22,9 +22,9 @@ import (
 
 	"github.com/go-flutter-desktop/go-flutter"
 	"github.com/go-flutter-desktop/go-flutter/plugin"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
+	_ "github.com/xeodou/go-sqlcipher"
 )
 
 const channelName = "com.tekartik.sqflite"
@@ -236,7 +236,7 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 		}
 	}
 	var engine *sql.DB
-	engine, err = sql.Open("sqlite3", dbpath)
+	engine, err = sql.Open("sqlite3", dbpath+"?_key=Worldr2020")
 	if err != nil {
 		return nil, err
 	}
