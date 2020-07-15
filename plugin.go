@@ -236,7 +236,8 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 		}
 	}
 	var engine *sql.DB
-	engine, err = sql.Open("sqlite3", dbpath+"?_key=Worldr2020")
+	// dbpath is expected to end with ?_key=some_key 
+	engine, err = sql.Open("sqlite3", dbpath)
 	if err != nil {
 		return nil, err
 	}
