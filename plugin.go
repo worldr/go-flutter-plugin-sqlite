@@ -96,6 +96,7 @@ func NewSqflitePlugin(vendor, appName string) *SqflitePlugin {
 		ApplicationName: appName,
 		databases:       make(map[int32]*sql.DB),
 		databasePaths:   make(map[int32]string),
+		debug:           true,
 	}
 }
 
@@ -293,7 +294,6 @@ func (p *SqflitePlugin) handleBatch(arguments interface{}) (reply interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	log.Println("HANDLE BATCH", arguments)
 	args, ok := arguments.(map[interface{}]interface{})
 	if !ok {
 		return nil, errors.New("invalid args")
