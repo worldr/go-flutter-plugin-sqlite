@@ -96,6 +96,7 @@ func NewSqflitePlugin(vendor, appName string) *SqflitePlugin {
 		ApplicationName: appName,
 		databases:       make(map[int32]*sql.DB),
 		databasePaths:   make(map[int32]string),
+		debug:           true,
 	}
 }
 
