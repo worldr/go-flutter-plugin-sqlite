@@ -252,7 +252,7 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 
 	// dbpath is supposed to contain _key parameter, or the db will fail to open
 	dbpath = dbPathWithoutParams + dbKey + dbParams
-	log.Println("db path WITH params =", dbPathWithoutParams)
+	log.Println("db path WITH params =", dbpath)
 	var engine *sql.DB
 	engine, err = sql.Open("sqlite3", dbpath)
 	if err != nil {
