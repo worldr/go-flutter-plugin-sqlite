@@ -204,25 +204,23 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 
 	// check that the path contains parameters
 	chunks := strings.Split(dbpath, "?")
-	if len(chunks) != 2 {
-		return nil, newError("db parameters are missing")
+	dbParams := ""
+	if len(chunks) > 1 {
+		dbParams = "&" + chunks[1]
 	}
 	dbPathWithoutParams := chunks[0]
 
-	// check that the parameters contain _key and it is not empty
-	chunks = strings.Split(chunks[1], "&")
-	var keyFound bool
-	for _, v := range chunks {
-		if strings.Index(v, "_key=") == 0 {
-			keyFound = len(v[5:]) > 0
-			break
-		}
-	}
-	if !keyFound {
+	// check that the path contains _key_param_ and it is not empty
+	chunks = strings.Split(dbPathWithoutParams, "_key_param_")
+	if len(chunks) != 2 {
 		return nil, newError("db key is missing")
 	}
+	dbKey := "?_key=" + chunks[1]
+	dbPathWithoutParams = chunks[0]
 
 	log.Println("db path without params =", dbPathWithoutParams)
+	log.Println("KEY =", dbKey)
+	log.Println("PARAMS =", dbParams)
 
 	var readOnly bool
 	var singleInstance bool
@@ -236,14 +234,14 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 	if readOnly {
 		log.Printf(errorFormat, "readonly not supported")
 	}
-	if MEMORY_DATABASE_PATH != dbpath {
-		err = os.MkdirAll(path.Dir(dbpath), 0755)
+	if MEMORY_DATABASE_PATH != dbPathWithoutParams {
+		err = os.MkdirAll(path.Dir(dbPathWithoutParams), 0755)
 		if err != nil {
 			return nil, newError(err.Error())
 		}
 	}
 	if singleInstance {
-		dbId, ok := p.getDatabaseByPath(dbpath)
+		dbId, ok := p.getDatabaseByPath(dbPathWithoutParams)
 		if ok {
 			return map[interface{}]interface{}{
 				PARAM_ID:        dbId,
@@ -253,6 +251,8 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 	}
 
 	// dbpath is supposed to contain _key parameter, or the db will fail to open
+	dbpath = dbPathWithoutParams + dbKey + dbParams
+	log.Println("db path WITH params =", dbPathWithoutParams)
 	var engine *sql.DB
 	engine, err = sql.Open("sqlite3", dbpath)
 	if err != nil {
@@ -262,7 +262,7 @@ func (p *SqflitePlugin) handleOpenDatabase(arguments interface{}) (reply interfa
 	defer p.Unlock()
 	p.databaseId++
 	p.databases[p.databaseId] = engine
-	p.databasePaths[p.databaseId] = dbpath
+	p.databasePaths[p.databaseId] = dbPathWithoutParams
 	return map[interface{}]interface{}{
 		PARAM_ID:        p.databaseId,
 		PARAM_RECOVERED: false,
