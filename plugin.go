@@ -18,7 +18,7 @@ import (
 	"github.com/go-flutter-desktop/go-flutter/plugin"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
-	_ "github.com/xeodou/go-sqlcipher"
+	_ "github.com/worldr/go-sqlcipher"
 )
 
 const channelName = "com.tekartik.sqflite"
